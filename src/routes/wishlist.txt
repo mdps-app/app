@@ -1,0 +1,81 @@
+<script lang="ts">
+	import {
+		addDoc,
+		collection,
+		onSnapshot,
+		query,
+		QuerySnapshot,
+		serverTimestamp,
+		FieldValue,
+		orderBy,
+		deleteDoc,
+		doc,
+		where
+	} from 'firebase/firestore';
+	import { db, auth } from '$lib/firebase';
+	import { signOut } from 'firebase/auth';
+
+	export let userId: string;
+
+	type Item = {
+		id?: string;
+		name: string;
+		timestamp: FieldValue;
+		uid: string;
+	};
+
+	let itemName: string = '';
+	let wishList: Item[] = [];
+
+	function addItem() {
+		if (itemName == '') return;
+		const item: Item = {
+			name: itemName,
+			timestamp: serverTimestamp(),
+            uid: userId
+		};
+		addDoc(collection(db, 'wishlist'), item);
+		itemName = '';
+	}
+	function delItem(item: Item) {
+		if (!item.id) return;
+		deleteDoc(doc(db, 'wishlist', item.id));
+	}
+
+	onSnapshot(
+		query(collection(db, "wishlist"), where("uid", "==", userId), orderBy("timestamp", "desc")),
+		(snapshot: QuerySnapshot): any => {
+			wishList = snapshot.docs.map((doc) => {
+				const data = doc.data();
+				const item: Item = {
+					id: doc.id,
+					name: data.name,
+					timestamp: data.timestamp,
+                    uid: userId
+				};
+				return item;
+			});
+		}
+	);
+</script>
+
+<section>
+	<div>
+		<h1>✅ Wish List</h1>
+		<div>
+			<input type="text" bind:value={itemName} />
+			<button on:click={addItem}>Add Item</button>
+		</div>
+		<ul>
+			{#each wishList as item}
+				<li>
+					<p><span>✔</span><span>{item.name}</span></p>
+					<button on:click={() => delItem(item)}>🗑️</button>
+				</li>
+			{/each}
+		</ul>
+	</div>
+	<div class="fixed right-2 top-2">
+		<button class="underline" on:click={() => signOut(auth)}>Logout</button>
+	</div>
+</section>
