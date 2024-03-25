@@ -1,0 +1,22 @@
+{
+  "indexes": [
+    {
+      "collectionId": "wishlist",
+      "fields": [
+        {"fieldPath": "uid", "mode": "DESCENDING"},
+        {"fieldPath": "timestamp", "mode": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionId": "storage",
+      "fields": [
+        {"fieldPath": "group", "mode": "DESCENDING"},
+        {"fieldPath": "num", "mode": "DESCENDING"},
+        {"fieldPath": "term", "mode": "DESCENDING"},
+        {"fieldPath": "termH", "mode": "DESCENDING"},
+        {"fieldPath": "zone", "mode": "DESCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
