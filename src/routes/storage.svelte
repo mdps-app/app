@@ -23,17 +23,41 @@
 		}
 	}
 
+	type IdTextPair = {
+		id: number;
+		text: string;
+	};
+
+	const idTextList: IdTextPair[] = [
+		{ id: 1, text: 'トイレ' },
+		{ id: 2, text: '衛生' },
+		{ id: 3, text: '食品関連' },
+		{ id: 4, text: '衣類' },
+		{ id: 5, text: '安全' },
+		{ id: 6, text: '暮らし' },
+		{ id: 7, text: '文房具' },
+	];
+	const zoneTextList: zoneTextPair[] = [
+		{ id: 1, text: 'A1'},
+		{ id: 2, text: 'A2'},
+		{ id: 3, text: 'A3'},
+	]
+	function getTextById(id: number, list): string | undefined {
+		const pair = list.find((pair) => pair.id === id);
+		return pair ? pair.text : id;
+	}
+
 	onSnapshot(query(collection(db, 'storage')), (snapshot: QuerySnapshot): any => {
 		storage = snapshot.docs.map((doc) => {
 			const data = doc.data();
 			const item: Item = {
 				id: doc.id,
-				group: data.group,
+				group: getTextById(data.group, idTextList),
 				name: data.name,
 				num: data.num,
 				term: data.term,
 				termH: data.termH,
-				zone: data.zone
+				zone: getTextById(data.zone, zoneTextList)
 			};
 			return item;
 		});
@@ -82,15 +106,25 @@
 	let sortAscending = true;
 
 	function sortItems(field) {
-		if (sortField === field) {
-			sortAscending = !sortAscending;
-		} else {
+		if (sortField !== field) {
 			sortField = field;
 			sortAscending = true;
+		} else {
+			sortAscending = !sortAscending;
 		}
 
-		storage = storage.sort((a, b) => {
-			if (field === 'term' || field === 'termH') {
+		storage = [...storage].sort((a, b) => {
+			if (field === 'term' || field === 'termH' || field === 'zone') {
+				if (!a[field] && !b[field]) return 0;
+				if (!a[field]) return 1;
+				if (!b[field]) return -1;
+			}
+
+			if (field === 'name') {
+				const nameA = a[field] || '';
+				const nameB = b[field] || '';
+				return sortAscending ? nameA.localeCompare(nameB, 'ja') : nameB.localeCompare(nameA, 'ja');
+			} else if (field === 'term' || field === 'termH') {
 				const dateA = new Date(a[field].replace(/\//g, '-'));
 				const dateB = new Date(b[field].replace(/\//g, '-'));
 				if (isNaN(dateA) || isNaN(dateB)) return 0;
@@ -111,17 +145,16 @@
 	}
 </script>
 
-<input type="text" bind:value={search} placeholder="Search by name..." />
+<input type="text" bind:value={search} placeholder="🔍検索" />
 <section>
 	<div>
 		<table width="100%" id="th">
 			<tr id="point">
-				<th width="5%">状態</th>
-				<th width="25%">品名</th>
+				<th width="25%" on:click={() => sortItems('name')}>品名</th>
 				<th width="10%" on:click={() => sortItems('group')}>分類</th>
-				<th width="10%">個数</th>
-				<th width="15%" on:click={() => sortItems('term')}>期限</th>
-				<th width="15%" on:click={() => sortItems('termH')}>保管期間</th>
+				<th width="10%" id="num">個数</th>
+				<th width="10%" on:click={() => sortItems('term')}>期限</th>
+				<th width="10%" on:click={() => sortItems('termH')}>保管期間</th>
 				<th width="10%" on:click={() => sortItems('zone')}>保管区域</th>
 			</tr>
 		</table>
@@ -131,12 +164,11 @@
 			{#each storage as item (item.id)}
 				{#if item.name.includes(search)}
 					<tr>
-						<td width="5%"></td>
 						<td width="25%" on:click={() => showDetails(item)}>{item.name}</td>
 						<td width="10%">{item.group}</td>
 						<td width="10%">{item.num}</td>
-						<td width="15%">{item.term}</td>
-						<td width="15%">{item.termH}</td>
+						<td width="10%">{item.term}</td>
+						<td width="10%">{item.termH}</td>
 						<td width="10%">{item.zone}</td>
 					</tr>
 				{/if}
@@ -146,10 +178,21 @@
 </section>
 
 <style lang="scss">
+	input {
+		height: 40px;
+		width: 300px;
+		margin-left: 25px;
+		margin-top: 10px;
+		padding-left: 10px;
+		background-color: #6ec8f5;
+		border: 3px solid rgb(0, 153, 255);
+		border-radius: 20px;
+	}
 	section {
 		width: 100%;
 		height: calc(100vh - 10em);
 		padding: 25px;
+		padding-top: 10px;
 	}
 	#table {
 		width: 100%;
@@ -173,9 +216,15 @@
 			padding: 10px;
 			border: dashed 3px rgb(0, 153, 255);
 
+			user-select: none;
+
 			position: sticky;
 			top: 0;
 			left: 0;
+		}
+
+		th:not([id]) {
+			cursor: pointer;
 		}
 	}
 	#td {
