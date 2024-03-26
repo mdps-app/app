@@ -84,7 +84,7 @@
 		termH: string;
 		zone: number;
 	}) {
-		goto(`/${item.id}`);
+		goto(`/storage/#${item.id}`);
 	}
 
 	import { onMount } from 'svelte';

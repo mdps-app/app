@@ -1,16 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	$: items = $page.params.id;
+	let items: string;
 
-	import {
-		collection,
-		onSnapshot,
-		query,
-		QuerySnapshot,
-		deleteDoc,
-		doc,
-		getDoc
-	} from 'firebase/firestore';
+	$: {
+		items = $page.url.hash.slice( 1 );
+	}
+
+	import { collection, onSnapshot, query, QuerySnapshot, deleteDoc, doc } from 'firebase/firestore';
 	import { db } from '$lib/firebase';
 
 	type Item = {
