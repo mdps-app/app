@@ -278,4 +278,87 @@
 	main {
 		margin-left: 110px;
 	}
+
+	@media (max-width: 1000px) {
+		header {
+			width: 200px;
+			top: 0;
+			right: 0;
+			grid-template-rows: 60px 1fr;
+			gap: 20px;
+
+			div {
+				grid-template-columns: 1fr 60px;
+			}
+
+			ul {
+				grid-template-rows: repeat(4, 60px) 1fr 60px;
+				position: relative;
+
+				li {
+					grid-template-columns: 60px 1fr;
+
+					p {
+						grid-column: 2 / 3;
+						grid-row: 1 / 2;
+						width: 100%;
+						height: 100%;
+
+						font-size: 1em;
+						display: flex;
+						justify-content: left;
+						align-items: center;
+
+						a {
+							color: #101213;
+							text-decoration: none;
+						}
+					}
+					span {
+						grid-column: 1 / 2;
+						grid-row: 1 / 2;
+						width: 100%;
+						height: 100%;
+
+						font-size: 2em;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+
+						a {
+							color: #101213;
+							text-decoration: none;
+						}
+					}
+				}
+			}
+		}
+		#menu {
+			grid-template-columns: 1fr;
+
+			label {
+				position: absolute;
+				top: -60px;
+				right: 220px;
+			}
+			div {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			span {
+				cursor: pointer;
+			}
+		}
+		header {
+			transform: translateX(200px);
+			transition: all 300ms 0s ease;
+		}
+		#triangle {
+			display: none;
+		}
+		main {
+			margin-left: 10px;
+		}
+	}
 </style>

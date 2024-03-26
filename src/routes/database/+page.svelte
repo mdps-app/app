@@ -164,6 +164,8 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 
+		z-index: 99;
+
 		user-select: none;
 
 		ul {
@@ -204,6 +206,36 @@
 					background-color: #3388dd;
 					border: #fff;
 					color: #fff;
+				}
+			}
+		}
+	}
+
+	@media (max-width: 1000px) {
+		.open_sub_window {
+			width: 50px;
+			height: 50px;
+
+			bottom: 15px;
+			right: 15px;
+
+			span {
+				width: 30px;
+			}
+		}
+		div {
+			width: 90%;
+
+			ul {
+				li {
+					grid-template-columns: 50px 1fr;
+					gap: 5px;
+
+					width: 100%;
+
+					p {
+						font-size: .5em;
+					}
 				}
 			}
 		}

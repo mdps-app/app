@@ -65,7 +65,16 @@
 	});
 </script>
 
-<h1>{items}</h1>
-<p>{urlItem ? urlItem.name : 'Item not found'}</p>
-
+<h1>{urlItem?.name}</h1>
+<div>
+	<p>分類：{urlItem?.group}</p>
+	<p>個数：{urlItem?.num}</p>
+	<p>期限：{urlItem?.term}</p>
+	<p>保管期間：{urlItem?.termH}</p>
+	<p>保管区域：{urlItem?.zone}</p>
+</div>
 <canvas bind:this={canvas}></canvas>
+<a href="../database">戻る</a>
+
+<style lang="scss">
+</style>

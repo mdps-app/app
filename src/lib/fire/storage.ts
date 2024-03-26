@@ -71,3 +71,5 @@ onSnapshot(query(collection(db, 'storage')), (snapshot: QuerySnapshot): any => {
 export function test() {
     return storage;
 }
+
+export let termLimit: number = 1;

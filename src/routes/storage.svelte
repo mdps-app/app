@@ -2,7 +2,7 @@
 	import { collection, onSnapshot, query, QuerySnapshot, deleteDoc, doc } from 'firebase/firestore';
 	import { db } from '$lib/firebase';
 	import { goto } from '$app/navigation';
-	import { idTextList, zoneTextList } from '$lib';
+	import { idTextList, zoneTextList, termLimit } from '$lib';
 	import type { Item } from '$lib';
 
 	let storage: Item[] = [];
@@ -98,6 +98,18 @@
 			}
 		});
 	}
+
+	function getBackgroundColor(dateStr: string) {
+		if (!dateStr) return 'transparent';
+		const date = new Date(dateStr.replace(/\//g, '-'));
+		const now = new Date();
+		const oneYearLater = new Date();
+		oneYearLater.setFullYear(now.getFullYear() + termLimit );
+		if (isNaN(date.getTime())) return 'transparent';
+		if (date.getTime() < now.getTime()) return 'red';
+		if (date.getTime() < oneYearLater.getTime()) return 'yellow';
+		return 'transparent';
+	}
 </script>
 
 <input type="text" bind:value={search} placeholder="🔍検索" />
@@ -122,8 +134,12 @@
 						<td width="25%" on:click={() => showDetails(item)}>{item.name}</td>
 						<td width="10%">{item.group}</td>
 						<td width="10%">{item.num}</td>
-						<td width="10%">{item.term}</td>
-						<td width="10%">{item.termH}</td>
+						<td width="10%" style="background-color: {getBackgroundColor(item.term)};"
+							>{item.term}</td
+						>
+						<td width="10%" style="background-color: {getBackgroundColor(item.termH)};"
+							>{item.termH}</td
+						>
 						<td width="10%">{item.zone}</td>
 					</tr>
 				{/if}
@@ -191,6 +207,33 @@
 		td {
 			padding: 3px 10px;
 			border: dashed 3px rgb(0, 153, 255);
+
+			&:first-of-type {
+				cursor: pointer;
+			}
+		}
+	}
+
+	@media(max-width : 1000px) {
+		input {
+			width: 80vw;
+			margin-bottom: 10px;
+		}
+		#th {
+			th:nth-of-type(3),
+			th:nth-of-type(4),
+			th:nth-of-type(5),
+			th:nth-of-type(6) {
+				display: none;
+			}
+		}
+		#td {
+			td:nth-of-type(3),
+			td:nth-of-type(4),
+			td:nth-of-type(5),
+			td:nth-of-type(6) {
+				display: none;
+			}
 		}
 	}
 </style>
