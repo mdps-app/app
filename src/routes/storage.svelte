@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { collection, onSnapshot, query, QuerySnapshot, deleteDoc, doc } from 'firebase/firestore';
 	import { db } from '$lib/firebase';
+	import { goto } from '$app/navigation';
 
 	type Item = {
 		id?: string;
@@ -61,6 +62,7 @@
 	}) {
 		selectedItem = item;
 		showModal = true;
+		goto(`/${item.id}`);
 	}
 
 	import { onMount } from 'svelte';
@@ -82,7 +84,6 @@
 	<div>
 		<table width="100%">
 			<tr>
-				{#if user}<th width="2%"></th>{/if}
 				<th width="5%">状態</th>
 				<th width="25%">品名</th>
 				<th width="10%">分類</th>
@@ -93,7 +94,6 @@
 			</tr>
 			{#each storage as item}
 				<tr>
-					{#if user}<tr><button on:click={() => delItem(item)}>🗑️</button></tr>{/if}
 					<td></td>
 					<td on:click={() => showDetails(item)}>{item.name}</td>
 					<td>{item.group}</td>

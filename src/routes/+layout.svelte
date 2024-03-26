@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { onAuthStateChanged } from 'firebase/auth';
 	import { auth, db } from '$lib/firebase';
 	import { tTop, check } from '$lib/pageMove';
@@ -25,6 +26,7 @@
 				if (!querySnapshot.empty) {
 				} else {
 					signOut(auth);
+					alert('承認されたアカウントでないため、ログアウトしました')
 				}
 			} else {
 			}
@@ -102,6 +104,7 @@
 							<button
 								class="underline"
 								on:click={() => {
+									goto(window.location.pathname, { replaceState: true });
 									signOut(auth);
 								}}>Logout</button
 							>
