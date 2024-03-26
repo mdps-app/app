@@ -60,8 +60,6 @@
 		termH: string;
 		zone: number;
 	}) {
-		selectedItem = item;
-		showModal = true;
 		goto(`/${item.id}`);
 	}
 
@@ -76,54 +74,119 @@
 			user = currentUser;
 		});
 
-		return unsubscribe; // コンポーネントのアンマウント時にリスナーを解除
+		return unsubscribe;
 	});
+
+	let search = '';
+	let sortField = '';
+	let sortAscending = true;
+
+	function sortItems(field) {
+		if (sortField === field) {
+			sortAscending = !sortAscending;
+		} else {
+			sortField = field;
+			sortAscending = true;
+		}
+
+		storage = storage.sort((a, b) => {
+			if (field === 'term' || field === 'termH') {
+				const dateA = new Date(a[field].replace(/\//g, '-'));
+				const dateB = new Date(b[field].replace(/\//g, '-'));
+				if (isNaN(dateA) || isNaN(dateB)) return 0;
+				return sortAscending ? dateA - dateB : dateB - dateA;
+			} else if (field === 'group' || field === 'zone') {
+				if (typeof a[field] !== 'string' || typeof b[field] !== 'string') return 0;
+				const groupA = a[field].toUpperCase();
+				const groupB = b[field].toUpperCase();
+				if (groupA < groupB) return sortAscending ? -1 : 1;
+				if (groupA > groupB) return sortAscending ? 1 : -1;
+				return 0;
+			} else {
+				if (a[field] < b[field]) return sortAscending ? -1 : 1;
+				if (a[field] > b[field]) return sortAscending ? 1 : -1;
+				return 0;
+			}
+		});
+	}
 </script>
 
+<input type="text" bind:value={search} placeholder="Search by name..." />
 <section>
 	<div>
-		<table width="100%">
-			<tr>
+		<table width="100%" id="th">
+			<tr id="point">
 				<th width="5%">状態</th>
 				<th width="25%">品名</th>
-				<th width="10%">分類</th>
+				<th width="10%" on:click={() => sortItems('group')}>分類</th>
 				<th width="10%">個数</th>
-				<th width="15%">期限</th>
-				<th width="15%">保管期間</th>
-				<th width="10%">保管区域</th>
+				<th width="15%" on:click={() => sortItems('term')}>期限</th>
+				<th width="15%" on:click={() => sortItems('termH')}>保管期間</th>
+				<th width="10%" on:click={() => sortItems('zone')}>保管区域</th>
 			</tr>
-			{#each storage as item}
-				<tr>
-					<td></td>
-					<td on:click={() => showDetails(item)}>{item.name}</td>
-					<td>{item.group}</td>
-					<td>{item.num}</td>
-					<td>{item.term}</td>
-					<td>{item.termH}</td>
-					<td>{item.zone}</td>
-				</tr>
+		</table>
+	</div>
+	<div id="table">
+		<table width="100%" id="td">
+			{#each storage as item (item.id)}
+				{#if item.name.includes(search)}
+					<tr>
+						<td width="5%"></td>
+						<td width="25%" on:click={() => showDetails(item)}>{item.name}</td>
+						<td width="10%">{item.group}</td>
+						<td width="10%">{item.num}</td>
+						<td width="15%">{item.term}</td>
+						<td width="15%">{item.termH}</td>
+						<td width="10%">{item.zone}</td>
+					</tr>
+				{/if}
 			{/each}
 		</table>
-
-		{#if showModal}
-			<div class="modal">
-				<h2>{selectedItem.name}</h2>
-				<p>Id: {selectedItem?.id}</p>
-				<p>Group: {selectedItem.group}</p>
-				<p>Number: {selectedItem.num}</p>
-				<p>Term: {selectedItem.term}</p>
-				<p>TermH: {selectedItem.termH}</p>
-				<p>Zone: {selectedItem.zone}</p>
-				<button on:click={() => (showModal = false)}>Close</button>
-			</div>
-		{/if}
 	</div>
 </section>
 
 <style lang="scss">
-	table {
+	section {
+		width: 100%;
+		height: calc(100vh - 10em);
+		padding: 25px;
+	}
+	#table {
+		width: 100%;
+		max-height: 100%;
+		overflow-y: auto;
+		overflow-x: hidden;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+
+		border-bottom: solid 4px rgb(0, 153, 255);
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+	#th {
+		border-collapse: collapse;
+		border: solid 4px rgb(0, 153, 255);
+
+		th {
+			padding: 10px;
+			border: dashed 3px rgb(0, 153, 255);
+
+			position: sticky;
+			top: 0;
+			left: 0;
+		}
+	}
+	#td {
 		width: 100%;
 		height: 100%;
-		padding: 25px;
+		border-collapse: collapse;
+		border: solid 4px rgb(0, 153, 255);
+
+		td {
+			padding: 3px 10px;
+			border: dashed 3px rgb(0, 153, 255);
+		}
 	}
 </style>
