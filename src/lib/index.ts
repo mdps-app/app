@@ -1,1 +1,2 @@
-// place files you want to import through the `$lib` alias in this folder.
+export { delItem, getTextById, idTextList, zoneTextList } from './fire/storage';
+export type { Item } from './fire/storage'

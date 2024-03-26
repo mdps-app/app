@@ -3,7 +3,7 @@
 	let items: string;
 
 	$: {
-		items = $page.url.hash.slice( 1 );
+		items = $page.url.hash.slice(1);
 	}
 
 	import { collection, onSnapshot, query, QuerySnapshot, deleteDoc, doc } from 'firebase/firestore';
@@ -53,7 +53,19 @@
 		});
 		details(storage.find((item: Item) => item.id === items));
 	});
+
+	import { onMount } from 'svelte';
+	import QRCode from 'qrcode';
+
+	let canvas: HTMLCanvasElement;
+	let url = "https://mdps-app.web.app/storage" + $page.url.hash
+
+	onMount(async () => {
+		await QRCode.toCanvas(canvas, url);
+	});
 </script>
 
-<h1>hello{items}</h1>
+<h1>{items}</h1>
 <p>{urlItem ? urlItem.name : 'Item not found'}</p>
+
+<canvas bind:this={canvas}></canvas>

@@ -2,47 +2,12 @@
 	import { collection, onSnapshot, query, QuerySnapshot, deleteDoc, doc } from 'firebase/firestore';
 	import { db } from '$lib/firebase';
 	import { goto } from '$app/navigation';
-
-	type Item = {
-		id?: string;
-		group: number;
-		name: string;
-		num: string;
-		term: string;
-		termH: string;
-		zone: number;
-	};
+	import { idTextList, zoneTextList } from '$lib';
+	import type { Item } from '$lib';
 
 	let storage: Item[] = [];
 
-	function delItem(item: Item) {
-		if (!item.id) return;
-		let confirmResult = window.confirm('「' + item.name + '」を削除しますか？');
-		if (confirmResult) {
-			deleteDoc(doc(db, 'storage', item.id));
-		}
-	}
-
-	type IdTextPair = {
-		id: number;
-		text: string;
-	};
-
-	const idTextList: IdTextPair[] = [
-		{ id: 1, text: 'トイレ' },
-		{ id: 2, text: '衛生' },
-		{ id: 3, text: '食品関連' },
-		{ id: 4, text: '衣類' },
-		{ id: 5, text: '安全' },
-		{ id: 6, text: '暮らし' },
-		{ id: 7, text: '文房具' },
-	];
-	const zoneTextList: zoneTextPair[] = [
-		{ id: 1, text: 'A1'},
-		{ id: 2, text: 'A2'},
-		{ id: 3, text: 'A3'},
-	]
-	function getTextById(id: number, list): string | undefined {
+	function getTextById(id: number, list: any[]): number {
 		const pair = list.find((pair) => pair.id === id);
 		return pair ? pair.text : id;
 	}
@@ -62,18 +27,6 @@
 			return item;
 		});
 	});
-	//<button on:click={() => delItem(item)}>🗑️</button>
-
-	let showModal = false;
-	let selectedItem: {
-		id?: string;
-		group: number;
-		name: string;
-		num: string;
-		term: string;
-		termH: string;
-		zone: number;
-	};
 
 	function showDetails(item: {
 		id?: string | undefined;
@@ -105,7 +58,7 @@
 	let sortField = '';
 	let sortAscending = true;
 
-	function sortItems(field) {
+	function sortItems(field: keyof Item) {
 		if (sortField !== field) {
 			sortField = field;
 			sortAscending = true;
@@ -121,24 +74,26 @@
 			}
 
 			if (field === 'name') {
-				const nameA = a[field] || '';
-				const nameB = b[field] || '';
+				const nameA = (a[field] as string) || '';
+				const nameB = (b[field] as string) || '';
 				return sortAscending ? nameA.localeCompare(nameB, 'ja') : nameB.localeCompare(nameA, 'ja');
 			} else if (field === 'term' || field === 'termH') {
-				const dateA = new Date(a[field].replace(/\//g, '-'));
-				const dateB = new Date(b[field].replace(/\//g, '-'));
-				if (isNaN(dateA) || isNaN(dateB)) return 0;
-				return sortAscending ? dateA - dateB : dateB - dateA;
+				const dateA = new Date((a[field] as string).replace(/\//g, '-'));
+				const dateB = new Date((b[field] as string).replace(/\//g, '-'));
+				if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) return 0;
+				return sortAscending
+					? dateA.getTime() - dateB.getTime()
+					: dateB.getTime() - dateA.getTime();
 			} else if (field === 'group' || field === 'zone') {
 				if (typeof a[field] !== 'string' || typeof b[field] !== 'string') return 0;
-				const groupA = a[field].toUpperCase();
-				const groupB = b[field].toUpperCase();
+				const groupA = (a[field] as unknown as string).toUpperCase();
+				const groupB = (b[field] as unknown as string).toUpperCase();
 				if (groupA < groupB) return sortAscending ? -1 : 1;
 				if (groupA > groupB) return sortAscending ? 1 : -1;
 				return 0;
 			} else {
-				if (a[field] < b[field]) return sortAscending ? -1 : 1;
-				if (a[field] > b[field]) return sortAscending ? 1 : -1;
+				if ((a[field] as any) < (b[field] as any)) return sortAscending ? -1 : 1;
+				if ((a[field] as any) > (b[field] as any)) return sortAscending ? 1 : -1;
 				return 0;
 			}
 		});

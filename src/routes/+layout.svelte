@@ -10,13 +10,10 @@
 	onAuthStateChanged(auth, (user) => {
 		userId = user ? user.uid : null;
 	});
-
 	import { onMount } from 'svelte';
 	import { setupAuthListener } from '$lib/logg.js';
 	import { query, collection, where, getDocs } from 'firebase/firestore';
-
 	let user = null;
-
 	onMount(() => {
 		const unsubscribe = setupAuthListener(async (currentUser) => {
 			user = currentUser;
@@ -26,13 +23,12 @@
 				if (!querySnapshot.empty) {
 				} else {
 					signOut(auth);
-					alert('承認されたアカウントでないため、ログアウトしました')
+					alert('承認されたアカウントでないため、ログアウトしました');
 				}
 			} else {
 			}
 		});
-
-		return unsubscribe; // コンポーネントのアンマウント時にリスナーを解除
+		return unsubscribe;
 	});
 </script>
 

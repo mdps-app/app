@@ -1,34 +1,15 @@
 <script lang="ts">
 	import { addDoc, collection } from 'firebase/firestore';
 	import { db } from '$lib/firebase';
-
-	type Item = {
-		id?: string;
-		group: number;
-		name: string;
-		num: string;
-		term: string;
-		termH: string;
-		zone: number;
-	};
+	import { idTextList, zoneTextList } from '$lib';
+	import type { Item } from '$lib';
 
 	let itemName: string = '';
 	let num: string = '';
-	let questions = [
-		{ id: 1, text: `トイレ` },
-		{ id: 2, text: `衛星` },
-		{ id: 3, text: `食品関連` }
-	];
-	let selected = questions[0];
+	let selected = idTextList[0];
 	let term = '';
 	let termH = '';
-
-	let zoneS = [
-		{ id: 1, text: 'A1' },
-		{ id: 2, text: 'A2' },
-		{ id: 3, text: 'A3' }
-	];
-	let zone = zoneS[0];
+	let zone = zoneTextList[0];
 
 	function addItem() {
 		if (itemName == '') return;
@@ -45,8 +26,8 @@
 		num = '';
 		term = '';
 		termH = '';
-		selected = questions[0];
-		zone = zoneS[0];
+		selected = idTextList[0];
+		zone = zoneTextList[0];
 	}
 
 	import { tTop, check } from '$lib/pageMove';
@@ -55,13 +36,12 @@
 	onMount(() => {
 		check.set(false);
 	});
-
 	tTop.set(270);
 
 	let flag = false;
 
 	import { onAuthStateChanged, type User } from 'firebase/auth';
-    import { auth } from '$lib/firebase';
+	import { auth } from '$lib/firebase';
 
 	let user: User | null = null;
 
@@ -69,8 +49,7 @@
 		const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
 			user = currentUser;
 		});
-
-		return unsubscribe; // コンポーネントのアンマウント時にリスナーを解除
+		return unsubscribe;
 	});
 </script>
 
@@ -91,7 +70,7 @@
 			<li>
 				<p>分類</p>
 				<select bind:value={selected}>
-					{#each questions as question}
+					{#each idTextList as question}
 						<option value={question}>
 							{question.text}
 						</option>
@@ -113,7 +92,7 @@
 			<li>
 				<p>保管区域</p>
 				<select bind:value={zone}>
-					{#each zoneS as question}
+					{#each zoneTextList as question}
 						<option value={question}>
 							{question.text}
 						</option>
