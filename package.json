@@ -39,6 +39,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@types/jquery": "^3.5.29",
 		"firebase": "^10.9.0",
 		"firebase-tools": "^13.5.2",
 		"qrcode": "^1.5.3",

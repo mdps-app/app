@@ -30,6 +30,19 @@
 		});
 		return unsubscribe;
 	});
+
+	onMount(() => {
+		const setHeight = () => {
+			const hSize = window.innerHeight;
+			const element = document.querySelector('.hCover');
+			if (element instanceof HTMLElement) {
+				element.style.height = `${hSize}px`;
+			}
+		};
+
+		setHeight();
+		window.addEventListener('resize', setHeight);
+	});
 </script>
 
 <svelte:head>
@@ -67,7 +80,7 @@
 
 <input id="checkbox" type="checkbox" bind:checked={$check} />
 <span id="triangle" style="top: {$tTop}px;"></span>
-<header>
+<header class="hCover">
 	<div>
 		<div>
 			<p>備品管理システム</p>
@@ -106,7 +119,7 @@
 							>
 						</div>
 					{:else if userId === null}
-						<Signin />
+						<a href="./setting">ログイン / 新規作成</a>
 					{:else}
 						<!-- ローディング表示 -->
 						<div class="flex justify-center mt-20">
@@ -121,7 +134,7 @@
 		</ul>
 	</nav>
 </header>
-<main>
+<main class="hCover">
 	<slot />
 </main>
 
