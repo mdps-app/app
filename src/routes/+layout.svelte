@@ -4,7 +4,8 @@
 	import { auth, db } from '$lib/firebase';
 	import { tTop, check } from '$lib/pageMove';
 	import { signOut } from 'firebase/auth';
-	import Signin from './signin.svelte';
+
+	import logo from '$lib/mdps.png'
 
 	let userId: string | null;
 	onAuthStateChanged(auth, (user) => {
@@ -86,7 +87,7 @@
 			<p>備品管理システム</p>
 			<p>-mdps-</p>
 		</div>
-		<img src="https://placehold.jp/150x150.png" alt="logo" />
+		<img src={logo} alt="logo" />
 	</div>
 	<nav>
 		<ul>
@@ -165,6 +166,11 @@
 			display: grid;
 			grid-template-columns: 1fr 100px;
 			grid-template-rows: 1fr;
+
+			img {
+				border-radius: 50%;
+				padding: 10px;
+			}
 		}
 		nav {
 			height: 100%;

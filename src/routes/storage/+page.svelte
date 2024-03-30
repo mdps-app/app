@@ -58,11 +58,18 @@
 	import QRCode from 'qrcode';
 
 	let canvas: HTMLCanvasElement;
-	let url = "https://mdps-app.web.app/storage" + $page.url.hash
+	let url = 'https://mdps-app.web.app/storage' + $page.url.hash;
 
 	onMount(async () => {
 		await QRCode.toCanvas(canvas, url);
 	});
+
+	import { writable } from 'svelte/store';
+	import { idTextList, zoneTextList } from '$lib';
+
+	// モーダルの表示状態を管理するストア
+	export const showModal = writable(false);
+
 </script>
 
 <h1>{urlItem?.name}</h1>
@@ -75,6 +82,7 @@
 </div>
 <canvas bind:this={canvas}></canvas>
 <a href="../database">戻る</a>
+<button on:click={() => showModal.set(true)}>編集</button>
 
 <style lang="scss">
 </style>

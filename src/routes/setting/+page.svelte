@@ -20,12 +20,18 @@
 	import { setupAuthListener } from '$lib/logg.js';
 	import { query, collection, where, getDocs } from 'firebase/firestore';
 	let user = null;
+	let displayName: string | null;
+	let email: string | null;
+	let photoURL: string | null;
 	onMount(() => {
 		const unsubscribe = setupAuthListener(async (currentUser) => {
 			user = currentUser;
 			if (user) {
 				const q = query(collection(db, 'approvedUsers'), where('uid', '==', user.uid));
 				const querySnapshot = await getDocs(q);
+				displayName = user.displayName;
+				email = user.email;
+				photoURL = user.photoURL;
 				if (!querySnapshot.empty) {
 				} else {
 					signOut(auth);
@@ -38,20 +44,21 @@
 	});
 
 	import { updatePassword } from 'firebase/auth';
-
 	let newPass: string;
 	async function updatePass(newPassword: string) {
-		const user = auth.currentUser;
-		if (user) {
-			try {
-				await updatePassword(user, newPassword);
-				console.log('Password updated successfully');
-				signOut(auth);
-			} catch (error) {
-				console.error('Error updating password: ', error);
+		if (newPassword.length <= 6) {
+			const user = auth.currentUser;
+			if (user) {
+				try {
+					await updatePassword(user, newPassword);
+					console.log('Password updated successfully');
+					signOut(auth);
+				} catch (error) {
+					console.error('Error updating password: ', error);
+				}
+			} else {
+				console.error('No user is currently logged in');
 			}
-		} else {
-			console.error('No user is currently logged in');
 		}
 	}
 </script>
@@ -66,9 +73,9 @@
 				signOut(auth);
 			}}>Logout</button
 		>
-		<p>user:{userId}</p>
+		<p>user:<span><img src={photoURL} alt="userIcon" />{displayName}（{email}）</span></p>
 	</div>
-	<input type="text" placeholder="new password" bind:value={newPass}>
+	<input type="text" placeholder="new password" bind:value={newPass} />
 	<button on:click={() => updatePass(newPass)}>パスワード変更</button>
 {:else if userId === null}
 	<Signin />
