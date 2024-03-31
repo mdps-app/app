@@ -117,12 +117,21 @@
 	<div>
 		<table width="100%" id="th">
 			<tr id="point">
-				<th width="25%" on:click={() => sortItems('name')}>品名</th>
-				<th width="10%" on:click={() => sortItems('group')}>分類</th>
-				<th width="10%" id="num">個数</th>
-				<th width="10%" on:click={() => sortItems('term')}>期限</th>
-				<th width="10%" on:click={() => sortItems('termH')}>保管期間</th>
-				<th width="10%" on:click={() => sortItems('zone')}>保管区域</th>
+				<style>
+					.th-width-25 {
+						width: 25%;
+					}
+					.th-width-10 {
+						width: 10%;
+					}
+				</style>
+
+				<th class="th-width-25" on:click={() => sortItems('name')}>品名</th>
+				<th class="th-width-10" on:click={() => sortItems('group')}>分類</th>
+				<th class="th-width-10" id="num">個数</th>
+				<th class="th-width-10" on:click={() => sortItems('term')}>期限</th>
+				<th class="th-width-10" on:click={() => sortItems('termH')}>保管期間</th>
+				<th class="th-width-10" on:click={() => sortItems('zone')}>保管区域</th>
 			</tr>
 		</table>
 	</div>
